@@ -818,8 +818,9 @@ fn parse_sysvar(path: &syn::Path) -> ParseResult<SysvarTy> {
     };
     const UNSUPPORTED_SLOT_HASHES_SYSVAR: &str =
         "SlotHashes cannot be used as a Sysvar account because it cannot be deserialized on chain";
-    const UNSUPPORTED_INSTRUCTIONS_SYSVAR: &str =
-        "Instructions cannot be used as a Sysvar account because it cannot be deserialized on chain";
+    const UNSUPPORTED_INSTRUCTIONS_SYSVAR: &str = "Instructions cannot be used as a Sysvar \
+                                                   account because it cannot be deserialized on \
+                                                   chain";
 
     let ty = match account_ident.to_string().as_str() {
         "Clock" => SysvarTy::Clock,
