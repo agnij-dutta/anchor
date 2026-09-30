@@ -47,3 +47,7 @@ jobs:
         with:
           exclude: avm, anchor-cli
           baseline-rev: ${{ github.event.pull_request.base.sha }}
+          # By default cargo-semver-checks enables every feature it can, which
+          # would turn on both `solana-v3` and `solana-v4` at once, and those are
+          # mutually exclusive.
+          feature-group: default-features

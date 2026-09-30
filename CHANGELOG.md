@@ -12,6 +12,8 @@ The minor version will be incremented upon a breaking change and the patch versi
 
 ### Features
 
+- lang: Add support for Solana v4 crates using the `solana-v4` feature ([#5081](https://github.com/otter-sec/anchor/pull/5081)).
+
 ### Fixes
 
 ### Breaking

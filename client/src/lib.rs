@@ -60,29 +60,16 @@
 //! ## `mock`
 //!
 //! This feature allows passing in a custom RPC client when creating program instances, which is
-//! useful for mocking RPC responses, e.g. via [`RpcClient::new_mock`].
-//!
-//! [`RpcClient::new_mock`]: https://docs.rs/solana-rpc-client/3.0.0/solana_rpc_client/rpc_client/struct.RpcClient.html#method.new_mock
+//! useful for mocking RPC responses, e.g. via
+//! [`RpcClient::new_mock`](solana_rpc_client::nonblocking::rpc_client::RpcClient::new_mock).
 
 #[cfg(feature = "async")]
 pub use nonblocking::ThreadSafeSigner;
-pub use {
-    anchor_lang,
-    cluster::Cluster,
-    solana_commitment_config::CommitmentConfig,
-    solana_hash::Hash,
-    solana_instruction::Instruction,
-    solana_message::AddressLookupTableAccount,
-    solana_pubsub_client::nonblocking::pubsub_client::PubsubClientError,
-    solana_rpc_client_api::{
-        client_error::{Error as SolanaClientError, ErrorKind as SolanaClientErrorKind},
-        config::RpcSendTransactionConfig,
-        filter::RpcFilterType,
-    },
-    solana_signer::{Signer, SignerError},
-    solana_transaction::{versioned::VersionedTransaction, Transaction},
-};
 use {
+    crate::compat::{
+        solana_account_decoder, solana_hash, solana_message, solana_pubsub_client,
+        solana_rpc_client, solana_rpc_client_api, solana_transaction,
+    },
     anchor_lang::{
         solana_program::{program_error::ProgramError, pubkey::Pubkey},
         AccountDeserialize, Discriminator, InstructionData, ToAccountMetas,
@@ -122,8 +109,26 @@ use {
         task::JoinHandle,
     },
 };
+pub use {
+    anchor_lang,
+    cluster::Cluster,
+    solana_commitment_config::CommitmentConfig,
+    solana_hash::Hash,
+    solana_instruction::Instruction,
+    solana_message::AddressLookupTableAccount,
+    solana_pubsub_client::nonblocking::pubsub_client::PubsubClientError,
+    solana_rpc_client_api::{
+        client_error::{Error as SolanaClientError, ErrorKind as SolanaClientErrorKind},
+        config::RpcSendTransactionConfig,
+        filter::RpcFilterType,
+    },
+    solana_signer::{Signer, SignerError},
+    solana_transaction::{versioned::VersionedTransaction, Transaction},
+};
 
 mod cluster;
+#[doc(hidden)]
+pub mod compat;
 
 /// Specifies which transaction version to use when building transactions.
 #[derive(Debug, Clone, Default)]
@@ -699,8 +704,8 @@ impl<C: Deref<Target = impl Signer> + Clone, S: AsSigner> RequestBuilder<'_, C, 
     /// use anchor_client::{Client, Cluster, TxVersion};
     /// use anchor_lang::prelude::Pubkey;
     /// use solana_signer::null_signer::NullSigner;
-    /// use solana_message::AddressLookupTableAccount;
-    /// use solana_message::Hash;
+    /// use anchor_client::AddressLookupTableAccount;
+    /// use anchor_client::Hash;
     ///
     /// let payer = NullSigner::new(&Pubkey::default());
     /// let client = Client::new(Cluster::Localnet, std::rc::Rc::new(payer));
