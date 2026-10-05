@@ -143,7 +143,7 @@ describe("Stack memory", () => {
     const programTarget = bench.get(version).sbpfArch
       ? `sbpf${bench.get(version).sbpfArch}`
       : version === "unreleased"
-      ? "sbpfv2"
+      ? "sbpfv3"
       : platformToolsMinor < 44
       ? "sbf"
       : "sbpf";

@@ -52,9 +52,8 @@ const IDL_PATH = path.join("target", "idl", "bench.json");
   });
   const buildEnv = {
     ...process.env,
-    // The benchmark suite runs on a legacy validator that cannot load v3
-    // programs. Keep its artifacts compatible with historical measurements.
-    ANCHOR_BUILD_SBF_ARCH: "v2",
+    // Current benchmarks use SBPFv3; historical versions retain their recorded architecture.
+    ANCHOR_BUILD_SBF_ARCH: "v3",
     RUSTC_BOOTSTRAP: "1",
     CARGO_TARGET_SBF_SOLANA_SOLANA_RUSTFLAGS: "-Z emit-stack-sizes",
     CARGO_TARGET_SBPF_SOLANA_SOLANA_RUSTFLAGS: "-Z emit-stack-sizes",
@@ -154,6 +153,8 @@ const IDL_PATH = path.join("target", "idl", "bench.json");
       const versionBuildEnv = {
         ...buildEnv,
         ANCHOR_BUILD_SBF_ARCH: bench.get(version).sbpfArch ?? "v2",
+        ANCHOR_TEST_VALIDATOR:
+          bench.get(version).sbpfArch === "v3" ? "surfpool" : "legacy",
       };
 
       // Resolve path dependencies in the cached lockfile before using the
@@ -217,10 +218,9 @@ const IDL_PATH = path.join("target", "idl", "bench.json");
       }
 
       const testArgs = ["test", "--skip-lint", "--skip-build"];
-      // v1.0.0 introduced Surfpool as the default validator. The benchmark
-      // suite uses the legacy validator, which is also configured in Anchor.toml.
+      // Use Surfpool for SBPFv3; preserve the legacy runtime for older measurements.
       if (version === "unreleased" || version >= "1.0.0") {
-        testArgs.push("--validator", "legacy");
+        testArgs.push("--validator", versionBuildEnv.ANCHOR_TEST_VALIDATOR);
       }
       const result = spawn("anchor", testArgs, {
         env: {
