@@ -52,31 +52,35 @@ const IDL_PATH = path.join("target", "idl", "bench.json");
     // separate test process.
     const currentBench = await BenchData.open();
     const solanaVersion = currentBench.get(version).solanaVersion;
-    const platformToolsResult = spawn(
-      "avm",
-      [
-        "platform-tools",
-        "resolve",
-        "--solana-version",
-        solanaVersion,
-        "--output",
-        "version",
-      ],
-      {
-        throwOnError: {
-          msg: `Failed to resolve platform-tools for Solana ${solanaVersion}.`,
-        },
-      }
-    );
-    const platformToolsOutput = platformToolsResult.stdout.toString().trim();
-    if (!/^v\d+\.\d+$/.test(platformToolsOutput)) {
-      throw new Error(
-        `AVM returned an invalid platform-tools version: ${platformToolsOutput}.`
+    let platformToolsVersion = currentBench.get(version).platformToolsVersion;
+    // Historical measurements must retain their recorded compiler version.
+    if (version === "unreleased") {
+      const platformToolsResult = spawn(
+        "avm",
+        [
+          "platform-tools",
+          "resolve",
+          "--solana-version",
+          solanaVersion,
+          "--output",
+          "version",
+        ],
+        {
+          throwOnError: {
+            msg: `Failed to resolve platform-tools for Solana ${solanaVersion}.`,
+          },
+        }
       );
+      const platformToolsOutput = platformToolsResult.stdout.toString().trim();
+      if (!/^v\d+\.\d+$/.test(platformToolsOutput)) {
+        throw new Error(
+          `AVM returned an invalid platform-tools version: ${platformToolsOutput}.`
+        );
+      }
+      platformToolsVersion = platformToolsOutput as PlatformToolsVersion;
+      currentBench.setPlatformToolsVersion(version, platformToolsVersion);
+      await currentBench.save();
     }
-    const platformToolsVersion = platformToolsOutput as PlatformToolsVersion;
-    currentBench.setPlatformToolsVersion(version, platformToolsVersion);
-    await currentBench.save();
 
     const isUnreleased = version === "unreleased";
 
@@ -131,6 +135,10 @@ const IDL_PATH = path.join("target", "idl", "bench.json");
       console.log(`Updating '${version}'...`);
 
       await setProjectVersion(version);
+      const versionBuildEnv = {
+        ...buildEnv,
+        ANCHOR_BUILD_SBF_ARCH: bench.get(version).sbpfArch ?? "v2",
+      };
 
       // Resolve path dependencies in the cached lockfile before using the
       // version's Cargo. Keep the original lockfile format for old Cargo
@@ -184,7 +192,7 @@ const IDL_PATH = path.join("target", "idl", "bench.json");
         buildArgs.push("--ignore-keys");
       }
       const buildResult = spawn("anchor", buildArgs, {
-        env: buildEnv,
+        env: versionBuildEnv,
       });
       if (buildResult.status !== 0) {
         console.error("Please fix the error and re-run this command.");
@@ -200,7 +208,7 @@ const IDL_PATH = path.join("target", "idl", "bench.json");
       }
       const result = spawn("anchor", testArgs, {
         env: {
-          ...buildEnv,
+          ...versionBuildEnv,
           [BENCHMARK_VERSION_ENV]: version,
         },
       });

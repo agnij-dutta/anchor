@@ -140,12 +140,13 @@ describe("Stack memory", () => {
     const platformToolsMinor = Number(platformToolsVersion.split(".")[1]);
     const platformToolsDirectory =
       platformToolsMinor < 37 ? "sbf-tools" : "platform-tools";
-    const programTarget =
-      version === "unreleased"
-        ? "sbpfv2"
-        : platformToolsMinor < 44
-        ? "sbf"
-        : "sbpf";
+    const programTarget = bench.get(version).sbpfArch
+      ? `sbpf${bench.get(version).sbpfArch}`
+      : version === "unreleased"
+      ? "sbpfv2"
+      : platformToolsMinor < 44
+      ? "sbf"
+      : "sbpf";
     const programPath = path.join(
       "target",
       `${programTarget}-solana-solana`,
