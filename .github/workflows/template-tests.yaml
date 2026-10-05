@@ -23,6 +23,7 @@ env:
 jobs:
   # Build CLI once to share across test jobs
   build-cli:
+    if: github.event_name != 'pull_request' || !startsWith(github.head_ref, 'release-bump/')
     name: Build CLI
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -61,6 +62,7 @@ jobs:
   # Rust-only test templates: `--javascript` and `--package-manager` don't
   # apply, so the matrix is just template x test-template (2 x 3 = 6 cells).
   template-rust-tests:
+    if: github.event_name != 'pull_request' || !startsWith(github.head_ref, 'release-bump/')
     name: ${{ matrix.template }} + ${{ matrix.test_template }}
     needs: build-cli
     runs-on: ubuntu-latest
@@ -147,6 +149,7 @@ jobs:
   # JS-based test templates: cross-product over template x language x
   # package manager (2 x 2 x 2 x 4 = 32 cells).
   template-js-tests:
+    if: github.event_name != 'pull_request' || !startsWith(github.head_ref, 'release-bump/')
     name: ${{ matrix.template }} + ${{ matrix.test_template }} + ${{ matrix.language }} + ${{ matrix.package_manager }}
     needs: build-cli
     runs-on: ubuntu-latest

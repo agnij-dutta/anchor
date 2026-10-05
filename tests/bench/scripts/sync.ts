@@ -31,9 +31,25 @@ const IDL_PATH = path.join("target", "idl", "bench.json");
   const anchorToml = await Toml.open(path.join("..", "Anchor.toml"));
   const originalAnchorToml = await fs.readFile(ANCHOR_TOML_PATH, "utf8");
 
-  const versions = bench
-    .getVersions()
-    .filter((version) => !bench.get(version).disabled);
+  const tags = spawn(
+    "git",
+    [
+      "ls-remote",
+      "--tags",
+      "--refs",
+      "https://github.com/otter-sec/anchor.git",
+    ],
+    { throwOnError: { msg: "Failed to list published benchmark versions." } }
+  ).stdout.toString();
+  const taggedVersions = new Set(
+    [...tags.matchAll(/refs\/tags\/v([^\s]+)/g)].map((match) => match[1])
+  );
+  const versions = bench.getVersions().filter((version) => {
+    if (bench.get(version).disabled) return false;
+    if (version === "unreleased" || taggedVersions.has(version)) return true;
+    console.log(`Skipping untagged release snapshot '${version}'.`);
+    return false;
+  });
   const buildEnv = {
     ...process.env,
     // The benchmark suite runs on a legacy validator that cannot load v3
