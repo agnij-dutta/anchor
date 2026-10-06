@@ -1491,7 +1491,7 @@ fn generate_constraint_mint(
                     return Err(anchor_lang::error::ErrorCode::ConstraintMintGroupPointerExtension.into());
                 }
                 #group_pointer_authority_optional_check
-                if group_pointer.unwrap().authority != ::anchor_spl::token_2022_extensions::spl_pod::optional_keys::OptionalNonZeroPubkey::try_from(Some(#group_pointer_authority.key()))? {
+                if group_pointer.unwrap().authority != ::anchor_spl::token_2022_extensions::solana_nullable::MaybeNull::try_from(Some(#group_pointer_authority.key())).map_err(|_| anchor_lang::error::ErrorCode::ConstraintMintGroupPointerExtensionAuthority)? {
                     return Err(anchor_lang::error::ErrorCode::ConstraintMintGroupPointerExtensionAuthority.into());
                 }
             }
@@ -1509,7 +1509,7 @@ fn generate_constraint_mint(
                     return Err(anchor_lang::error::ErrorCode::ConstraintMintGroupPointerExtension.into());
                 }
                 #group_pointer_group_address_optional_check
-                if group_pointer.unwrap().group_address != ::anchor_spl::token_2022_extensions::spl_pod::optional_keys::OptionalNonZeroPubkey::try_from(Some(#group_pointer_group_address.key()))? {
+                if group_pointer.unwrap().group_address != ::anchor_spl::token_2022_extensions::solana_nullable::MaybeNull::try_from(Some(#group_pointer_group_address.key())).map_err(|_| anchor_lang::error::ErrorCode::ConstraintMintGroupPointerExtensionGroupAddress)? {
                     return Err(anchor_lang::error::ErrorCode::ConstraintMintGroupPointerExtensionGroupAddress.into());
                 }
             }
@@ -1527,7 +1527,7 @@ fn generate_constraint_mint(
                     return Err(anchor_lang::error::ErrorCode::ConstraintMintGroupMemberPointerExtension.into());
                 }
                 #group_member_pointer_authority_optional_check
-                if group_member_pointer.unwrap().authority != ::anchor_spl::token_2022_extensions::spl_pod::optional_keys::OptionalNonZeroPubkey::try_from(Some(#group_member_pointer_authority.key()))? {
+                if group_member_pointer.unwrap().authority != ::anchor_spl::token_2022_extensions::solana_nullable::MaybeNull::try_from(Some(#group_member_pointer_authority.key())).map_err(|_| anchor_lang::error::ErrorCode::ConstraintMintGroupMemberPointerExtensionAuthority)? {
                     return Err(anchor_lang::error::ErrorCode::ConstraintMintGroupMemberPointerExtensionAuthority.into());
                 }
             }
@@ -1545,7 +1545,7 @@ fn generate_constraint_mint(
                     return Err(anchor_lang::error::ErrorCode::ConstraintMintGroupMemberPointerExtension.into());
                 }
                 #group_member_pointer_member_address_optional_check
-                if group_member_pointer.unwrap().member_address != ::anchor_spl::token_2022_extensions::spl_pod::optional_keys::OptionalNonZeroPubkey::try_from(Some(#group_member_pointer_member_address.key()))? {
+                if group_member_pointer.unwrap().member_address != ::anchor_spl::token_2022_extensions::solana_nullable::MaybeNull::try_from(Some(#group_member_pointer_member_address.key())).map_err(|_| anchor_lang::error::ErrorCode::ConstraintMintGroupMemberPointerExtensionMemberAddress)? {
                     return Err(anchor_lang::error::ErrorCode::ConstraintMintGroupMemberPointerExtensionMemberAddress.into());
                 }
             }
@@ -1563,7 +1563,7 @@ fn generate_constraint_mint(
                     return Err(anchor_lang::error::ErrorCode::ConstraintMintMetadataPointerExtension.into());
                 }
                 #metadata_pointer_authority_optional_check
-                if metadata_pointer.unwrap().authority != ::anchor_spl::token_2022_extensions::spl_pod::optional_keys::OptionalNonZeroPubkey::try_from(Some(#metadata_pointer_authority.key()))? {
+                if metadata_pointer.unwrap().authority != ::anchor_spl::token_2022_extensions::solana_nullable::MaybeNull::try_from(Some(#metadata_pointer_authority.key())).map_err(|_| anchor_lang::error::ErrorCode::ConstraintMintMetadataPointerExtensionAuthority)? {
                     return Err(anchor_lang::error::ErrorCode::ConstraintMintMetadataPointerExtensionAuthority.into());
                 }
             }
@@ -1581,7 +1581,7 @@ fn generate_constraint_mint(
                     return Err(anchor_lang::error::ErrorCode::ConstraintMintMetadataPointerExtension.into());
                 }
                 #metadata_pointer_metadata_address_optional_check
-                if metadata_pointer.unwrap().metadata_address != ::anchor_spl::token_2022_extensions::spl_pod::optional_keys::OptionalNonZeroPubkey::try_from(Some(#metadata_pointer_metadata_address.key()))? {
+                if metadata_pointer.unwrap().metadata_address != ::anchor_spl::token_2022_extensions::solana_nullable::MaybeNull::try_from(Some(#metadata_pointer_metadata_address.key())).map_err(|_| anchor_lang::error::ErrorCode::ConstraintMintMetadataPointerExtensionMetadataAddress)? {
                     return Err(anchor_lang::error::ErrorCode::ConstraintMintMetadataPointerExtensionMetadataAddress.into());
                 }
             }
@@ -1599,7 +1599,7 @@ fn generate_constraint_mint(
                     return Err(anchor_lang::error::ErrorCode::ConstraintMintCloseAuthorityExtension.into());
                 }
                 #close_authority_optional_check
-                if close_authority.unwrap().close_authority != ::anchor_spl::token_2022_extensions::spl_pod::optional_keys::OptionalNonZeroPubkey::try_from(Some(#close_authority.key()))? {
+                if close_authority.unwrap().close_authority != ::anchor_spl::token_2022_extensions::solana_nullable::MaybeNull::try_from(Some(#close_authority.key())).map_err(|_| anchor_lang::error::ErrorCode::ConstraintMintCloseAuthorityExtensionAuthority)? {
                     return Err(anchor_lang::error::ErrorCode::ConstraintMintCloseAuthorityExtensionAuthority.into());
                 }
             }
@@ -1617,7 +1617,7 @@ fn generate_constraint_mint(
                     return Err(anchor_lang::error::ErrorCode::ConstraintMintPermanentDelegateExtension.into());
                 }
                 #permanent_delegate_optional_check
-                if permanent_delegate.unwrap().delegate != ::anchor_spl::token_2022_extensions::spl_pod::optional_keys::OptionalNonZeroPubkey::try_from(Some(#permanent_delegate.key()))? {
+                if permanent_delegate.unwrap().delegate != ::anchor_spl::token_2022_extensions::solana_nullable::MaybeNull::try_from(Some(#permanent_delegate.key())).map_err(|_| anchor_lang::error::ErrorCode::ConstraintMintPermanentDelegateExtensionDelegate)? {
                     return Err(anchor_lang::error::ErrorCode::ConstraintMintPermanentDelegateExtensionDelegate.into());
                 }
             }
@@ -1635,7 +1635,7 @@ fn generate_constraint_mint(
                     return Err(anchor_lang::error::ErrorCode::ConstraintMintTransferHookExtension.into());
                 }
                 #transfer_hook_authority_optional_check
-                if transfer_hook.unwrap().authority != ::anchor_spl::token_2022_extensions::spl_pod::optional_keys::OptionalNonZeroPubkey::try_from(Some(#transfer_hook_authority.key()))? {
+                if transfer_hook.unwrap().authority != ::anchor_spl::token_2022_extensions::solana_nullable::MaybeNull::try_from(Some(#transfer_hook_authority.key())).map_err(|_| anchor_lang::error::ErrorCode::ConstraintMintTransferHookExtensionAuthority)? {
                     return Err(anchor_lang::error::ErrorCode::ConstraintMintTransferHookExtensionAuthority.into());
                 }
             }
@@ -1653,7 +1653,7 @@ fn generate_constraint_mint(
                     return Err(anchor_lang::error::ErrorCode::ConstraintMintTransferHookExtension.into());
                 }
                 #transfer_hook_program_id_optional_check
-                if transfer_hook.unwrap().program_id != ::anchor_spl::token_2022_extensions::spl_pod::optional_keys::OptionalNonZeroPubkey::try_from(Some(#transfer_hook_program_id.key()))? {
+                if transfer_hook.unwrap().program_id != ::anchor_spl::token_2022_extensions::solana_nullable::MaybeNull::try_from(Some(#transfer_hook_program_id.key())).map_err(|_| anchor_lang::error::ErrorCode::ConstraintMintTransferHookExtensionProgramId)? {
                     return Err(anchor_lang::error::ErrorCode::ConstraintMintTransferHookExtensionProgramId.into());
                 }
             }
@@ -1671,7 +1671,7 @@ fn generate_constraint_mint(
                     return Err(anchor_lang::error::ErrorCode::ConstraintMintPausableExtension.into());
                 }
                 #pausable_authority_optional_check
-                if pausable.unwrap().authority != ::anchor_spl::token_2022_extensions::spl_pod::optional_keys::OptionalNonZeroPubkey::try_from(Some(#pausable_authority.key()))? {
+                if pausable.unwrap().authority != ::anchor_spl::token_2022_extensions::solana_nullable::MaybeNull::try_from(Some(#pausable_authority.key())).map_err(|_| anchor_lang::error::ErrorCode::ConstraintMintPausableAuthority)? {
                     return Err(anchor_lang::error::ErrorCode::ConstraintMintPausableAuthority.into());
                 }
             }

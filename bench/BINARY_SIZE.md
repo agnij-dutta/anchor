@@ -18,7 +18,19 @@ Solana version: 3.1.10
 
 | Program | Binary Size | -   |
 | ------- | ----------- | --- |
-| bench   | 932,992     | -   |
+| bench   | 891,144     | -   |
+
+### Notable changes
+
+---
+
+## [1.2.1]
+
+Solana version: 3.1.10
+
+| Program | Binary Size | -   |
+| ------- | ----------- | --- |
+| bench   | 891,144     | -   |
 
 ### Notable changes
 
@@ -28,11 +40,13 @@ Solana version: 3.1.10
 
 Solana version: 3.1.10
 
-| Program | Binary Size | -   |
-| ------- | ----------- | --- |
-| bench   | 932,992     | -   |
+| Program | Binary Size | -                      |
+| ------- | ----------- | ---------------------- |
+| bench   | 891,144     | 🟢 **-41,848 (4.49%)** |
 
 ### Notable changes
+
+- Remeasured with platform-tools v1.57, SBPFv3, and Surfpool 1.5.0 to match 1.2.1. Comparisons with earlier releases include toolchain changes.
 
 ---
 

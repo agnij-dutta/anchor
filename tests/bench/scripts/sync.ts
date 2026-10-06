@@ -31,14 +31,29 @@ const IDL_PATH = path.join("target", "idl", "bench.json");
   const anchorToml = await Toml.open(path.join("..", "Anchor.toml"));
   const originalAnchorToml = await fs.readFile(ANCHOR_TOML_PATH, "utf8");
 
-  const versions = bench
-    .getVersions()
-    .filter((version) => !bench.get(version).disabled);
+  const tags = spawn(
+    "git",
+    [
+      "ls-remote",
+      "--tags",
+      "--refs",
+      "https://github.com/otter-sec/anchor.git",
+    ],
+    { throwOnError: { msg: "Failed to list published benchmark versions." } }
+  ).stdout.toString();
+  const taggedVersions = new Set(
+    [...tags.matchAll(/refs\/tags\/v([^\s]+)/g)].map((match) => match[1])
+  );
+  const versions = bench.getVersions().filter((version) => {
+    if (bench.get(version).disabled) return false;
+    if (version === "unreleased" || taggedVersions.has(version)) return true;
+    console.log(`Skipping untagged release snapshot '${version}'.`);
+    return false;
+  });
   const buildEnv = {
     ...process.env,
-    // The benchmark suite runs on a legacy validator that cannot load v3
-    // programs. Keep its artifacts compatible with historical measurements.
-    ANCHOR_BUILD_SBF_ARCH: "v2",
+    // Current benchmarks use SBPFv3; historical versions retain their recorded architecture.
+    ANCHOR_BUILD_SBF_ARCH: "v3",
     RUSTC_BOOTSTRAP: "1",
     CARGO_TARGET_SBF_SOLANA_SOLANA_RUSTFLAGS: "-Z emit-stack-sizes",
     CARGO_TARGET_SBPF_SOLANA_SOLANA_RUSTFLAGS: "-Z emit-stack-sizes",
@@ -52,31 +67,35 @@ const IDL_PATH = path.join("target", "idl", "bench.json");
     // separate test process.
     const currentBench = await BenchData.open();
     const solanaVersion = currentBench.get(version).solanaVersion;
-    const platformToolsResult = spawn(
-      "avm",
-      [
-        "platform-tools",
-        "resolve",
-        "--solana-version",
-        solanaVersion,
-        "--output",
-        "version",
-      ],
-      {
-        throwOnError: {
-          msg: `Failed to resolve platform-tools for Solana ${solanaVersion}.`,
-        },
-      }
-    );
-    const platformToolsOutput = platformToolsResult.stdout.toString().trim();
-    if (!/^v\d+\.\d+$/.test(platformToolsOutput)) {
-      throw new Error(
-        `AVM returned an invalid platform-tools version: ${platformToolsOutput}.`
+    let platformToolsVersion = currentBench.get(version).platformToolsVersion;
+    // Historical measurements must retain their recorded compiler version.
+    if (version === "unreleased") {
+      const platformToolsResult = spawn(
+        "avm",
+        [
+          "platform-tools",
+          "resolve",
+          "--solana-version",
+          solanaVersion,
+          "--output",
+          "version",
+        ],
+        {
+          throwOnError: {
+            msg: `Failed to resolve platform-tools for Solana ${solanaVersion}.`,
+          },
+        }
       );
+      const platformToolsOutput = platformToolsResult.stdout.toString().trim();
+      if (!/^v\d+\.\d+$/.test(platformToolsOutput)) {
+        throw new Error(
+          `AVM returned an invalid platform-tools version: ${platformToolsOutput}.`
+        );
+      }
+      platformToolsVersion = platformToolsOutput as PlatformToolsVersion;
+      currentBench.setPlatformToolsVersion(version, platformToolsVersion);
+      await currentBench.save();
     }
-    const platformToolsVersion = platformToolsOutput as PlatformToolsVersion;
-    currentBench.setPlatformToolsVersion(version, platformToolsVersion);
-    await currentBench.save();
 
     const isUnreleased = version === "unreleased";
 
@@ -131,6 +150,12 @@ const IDL_PATH = path.join("target", "idl", "bench.json");
       console.log(`Updating '${version}'...`);
 
       await setProjectVersion(version);
+      const versionBuildEnv = {
+        ...buildEnv,
+        ANCHOR_BUILD_SBF_ARCH: bench.get(version).sbpfArch ?? "v2",
+        ANCHOR_TEST_VALIDATOR:
+          bench.get(version).sbpfArch === "v3" ? "surfpool" : "legacy",
+      };
 
       // Resolve path dependencies in the cached lockfile before using the
       // version's Cargo. Keep the original lockfile format for old Cargo
@@ -184,7 +209,7 @@ const IDL_PATH = path.join("target", "idl", "bench.json");
         buildArgs.push("--ignore-keys");
       }
       const buildResult = spawn("anchor", buildArgs, {
-        env: buildEnv,
+        env: versionBuildEnv,
       });
       if (buildResult.status !== 0) {
         console.error("Please fix the error and re-run this command.");
@@ -193,14 +218,13 @@ const IDL_PATH = path.join("target", "idl", "bench.json");
       }
 
       const testArgs = ["test", "--skip-lint", "--skip-build"];
-      // v1.0.0 introduced Surfpool as the default validator. The benchmark
-      // suite uses the legacy validator, which is also configured in Anchor.toml.
+      // Use Surfpool for SBPFv3; preserve the legacy runtime for older measurements.
       if (version === "unreleased" || version >= "1.0.0") {
-        testArgs.push("--validator", "legacy");
+        testArgs.push("--validator", versionBuildEnv.ANCHOR_TEST_VALIDATOR);
       }
       const result = spawn("anchor", testArgs, {
         env: {
-          ...buildEnv,
+          ...versionBuildEnv,
           [BENCHMARK_VERSION_ENV]: version,
         },
       });

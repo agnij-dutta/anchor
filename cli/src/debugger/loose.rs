@@ -21,6 +21,7 @@
 //! errors instead of opaque "no traces" messages later.
 
 use {
+    crate::compat::solana_pubkey,
     anyhow::{anyhow, Context, Result},
     serde::Deserialize,
     solana_keypair::read_keypair_file,
