@@ -187,11 +187,12 @@ const IDL_PATH = path.join("target", "idl", "bench.json");
       console.log(`Updating '${version}'...`);
 
       await setProjectVersion(version);
+      const sbpfArch =
+        bench.get(version).sbpfArch ?? (version === "unreleased" ? "v3" : "v2");
       const versionBuildEnv = {
         ...buildEnv,
-        ANCHOR_BUILD_SBF_ARCH: bench.get(version).sbpfArch ?? "v2",
-        ANCHOR_TEST_VALIDATOR:
-          bench.get(version).sbpfArch === "v3" ? "surfpool" : "legacy",
+        ANCHOR_BUILD_SBF_ARCH: sbpfArch,
+        ANCHOR_TEST_VALIDATOR: sbpfArch === "v3" ? "surfpool" : "legacy",
       };
 
       // Resolve path dependencies in the cached lockfile before using the
